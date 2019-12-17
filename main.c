@@ -49,7 +49,7 @@
 * Header files includes
 ******************************************************************************/
 #include "cybsp.h"
-#include "freeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "capsense_task.h"
