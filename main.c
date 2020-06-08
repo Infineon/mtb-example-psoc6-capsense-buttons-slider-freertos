@@ -10,11 +10,11 @@
 *              This code example uses FreeRTOS. For documentation and API
 *              references of FreeRTOS, visit : https://www.freertos.org
 *
-* Related Document: README.md
+* Related Document: See README.md
 *
-********************************************************************************
-* (c) 2019, Cypress Semiconductor Corporation.
-********************************************************************************
+*******************************************************************************
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
+*******************************************************************************
 * This software, including source code, documentation and related materials
 * ("Software"), is owned by Cypress Semiconductor Corporation or one of its
 * subsidiaries ("Cypress") and is protected by and subject to worldwide patent
@@ -46,7 +46,7 @@
 
 
 /******************************************************************************
-* Header files includes
+* Include header files
 ******************************************************************************/
 #include "cybsp.h"
 #include "FreeRTOS.h"

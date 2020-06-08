@@ -6,7 +6,7 @@
 * Related Document: README.md
 *
 ********************************************************************************
-* Copyright (2019), Cypress Semiconductor Corporation.
+* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
 ********************************************************************************
 * This software, including source code, documentation and related materials
 * (“Software”), is owned by Cypress Semiconductor Corporation or one of its
@@ -86,7 +86,7 @@ void task_led(void* param)
     /* Suppress warning for unused parameter */
     (void)param;
 
-    /* Configure the TCPWM for driving led */
+    /* Initialize a PWM resource for driving an LED. */
     cyhal_pwm_init(&pwm_led, CYBSP_USER_LED, NULL);
     cyhal_pwm_set_duty_cycle(&pwm_led, GET_DUTY_CYCLE(LED_MAX_BRIGHTNESS),
                              PWM_LED_FREQ_HZ);
@@ -112,6 +112,7 @@ void task_led(void* param)
                         /* Start PWM to turn the LED on */
                         cyhal_pwm_start(&pwm_led);
                         led_on = true;
+                        led_cmd_data.brightness=LED_MAX_BRIGHTNESS;
                     }
                     break;
                 }
@@ -123,20 +124,24 @@ void task_led(void* param)
                         /* Stop PWM to turn the LED off */
                         cyhal_pwm_stop(&pwm_led);
                         led_on = false;
+                        led_cmd_data.brightness=0;
                     }
                     break;
                 }
                 /* Update LED brightness */
                 case LED_UPDATE_BRIGHTNESS:
                 {
-                    if (led_on)
+                    if ((led_on) || ((!led_on) && (led_cmd_data.brightness>0)))
                     {
+                        /* Start PWM to turn the LED on */
+                        cyhal_pwm_start(&pwm_led);
                         uint32_t brightness = (led_cmd_data.brightness < LED_MIN_BRIGHTNESS) ?
                                                LED_MIN_BRIGHTNESS : led_cmd_data.brightness;
 
                         /* Drive the LED with brightness */
                         cyhal_pwm_set_duty_cycle(&pwm_led, GET_DUTY_CYCLE(brightness),
                                                  PWM_LED_FREQ_HZ);
+                        led_on = true;
                     }
                     break;
                 }

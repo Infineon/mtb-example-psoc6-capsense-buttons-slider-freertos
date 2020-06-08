@@ -190,6 +190,6 @@ standard names - or at least those used in the unmodified vector table. */
 #define HEAP_ALLOCATION_TYPE5                       (5)     /* heap_5.c*/
 #define NO_HEAP_ALLOCATION                          (0)
 
-#define configHEAP_ALLOCATION_SCHEME                (HEAP_ALLOCATION_TYPE4) /* Updated */
+#define configHEAP_ALLOCATION_SCHEME                (HEAP_ALLOCATION_TYPE3) /* Updated */
 
 #endif /* FREERTOS_CONFIG_H */
