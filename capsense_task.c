@@ -66,13 +66,12 @@
 /*******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-static cy_status capsense_init(void);
+static uint32_t capsense_init(void);
 static void tuner_init(void);
 static void process_touch(void);
 static void capsense_isr(void);
 static void capsense_end_of_scan_callback(cy_stc_active_scan_sns_t* active_scan_sns_ptr);
 static void capsense_timer_callback(TimerHandle_t xTimer);
-static void handle_ezi2c_tuner_event(void *callback_arg, cyhal_ezi2c_status_t event);
 void handle_error(void);
 
 /******************************************************************************
@@ -84,6 +83,23 @@ cy_stc_scb_ezi2c_context_t ezi2c_context;
 cyhal_ezi2c_t sEzI2C;
 cyhal_ezi2c_slave_cfg_t sEzI2C_sub_cfg;
 cyhal_ezi2c_cfg_t sEzI2C_cfg;
+
+/* SysPm callback params */
+cy_stc_syspm_callback_params_t callback_params =
+{
+    .base       = CYBSP_CSD_HW,
+    .context    = &cy_capsense_context
+};
+
+cy_stc_syspm_callback_t capsense_deep_sleep_cb =
+{
+    Cy_CapSense_DeepSleepCallback,
+    CY_SYSPM_DEEPSLEEP,
+    (CY_SYSPM_SKIP_CHECK_FAIL | CY_SYSPM_SKIP_BEFORE_TRANSITION | CY_SYSPM_SKIP_AFTER_TRANSITION),
+    &callback_params,
+    NULL,
+    NULL
+};
 
 /*******************************************************************************
 * Function Name: handle_error
@@ -284,9 +300,9 @@ static void process_touch(void)
 *  interrupt.
 *
 *******************************************************************************/
-static cy_status capsense_init(void)
+static uint32_t capsense_init(void)
 {
-    cy_status status = CYRET_SUCCESS;
+    uint32_t status = CYRET_SUCCESS;
 
     /* CapSense interrupt configuration parameters */
     static const cy_stc_sysint_t capSense_intr_config =
@@ -307,6 +323,9 @@ static cy_status capsense_init(void)
     NVIC_ClearPendingIRQ(capSense_intr_config.intrSrc);
     NVIC_EnableIRQ(capSense_intr_config.intrSrc);
 
+    /* Initialize the CapSense deep sleep callback functions. */
+    Cy_CapSense_Enable(&cy_capsense_context);
+    Cy_SysPm_RegisterCallback(&capsense_deep_sleep_cb);
     /* Register end of scan callback */
     status = Cy_CapSense_RegisterCallback(CY_CAPSENSE_END_OF_SCAN_E,
                                               capsense_end_of_scan_callback, &cy_capsense_context);
@@ -362,6 +381,7 @@ static void capsense_end_of_scan_callback(cy_stc_active_scan_sns_t* active_scan_
 *******************************************************************************/
 static void capsense_timer_callback(TimerHandle_t xTimer)
 {
+	Cy_CapSense_Wakeup(&cy_capsense_context);
     capsense_command_t command = CAPSENSE_SCAN;
     BaseType_t xYieldRequired;
 
@@ -387,40 +407,6 @@ static void capsense_isr(void)
 
 
 /*******************************************************************************
-* Function Name: ezi2c_isr
-********************************************************************************
-* Summary:
-*  Wrapper function for handling interrupts from EZI2C block.
-*
-*******************************************************************************/
-static void handle_ezi2c_tuner_event(void *callback_arg, cyhal_ezi2c_status_t event)
-{
-    cyhal_ezi2c_status_t status;
-    cy_stc_scb_ezi2c_context_t *context = &ezi2c_context;
-
-    /* Get the slave interrupt sources */
-    status = cyhal_ezi2c_get_activity_status(&sEzI2C);
-
-    /* Handle the error conditions */
-    if (0UL != (CYHAL_EZI2C_STATUS_ERR & status))
-    {
-        handle_error();
-    }
-
-    /* Handle the receive direction (master writes data) */
-    if (0 != (CYHAL_EZI2C_STATUS_READ1 & status))
-    {
-        cyhal_i2c_slave_config_write_buffer((cyhal_i2c_t *)&sEzI2C, context->curBuf, context->bufSize);
-    }
-    /* Handle the transmit direction (master reads data) */
-    if (0 != (CYHAL_EZI2C_STATUS_WRITE1 & status))
-    {
-        cyhal_i2c_slave_config_read_buffer((cyhal_i2c_t *)&sEzI2C, context->curBuf, context->bufSize);
-    }
-}
-
-
-/*******************************************************************************
 * Function Name: tuner_init
 ********************************************************************************
 * Summary:
@@ -437,19 +423,15 @@ static void tuner_init(void)
     sEzI2C_sub_cfg.slave_address = 8U;
 
     sEzI2C_cfg.data_rate = CYHAL_EZI2C_DATA_RATE_400KHZ;
-    sEzI2C_cfg.enable_wake_from_sleep = false;
+    sEzI2C_cfg.enable_wake_from_sleep = true;
     sEzI2C_cfg.slave1_cfg = sEzI2C_sub_cfg;
     sEzI2C_cfg.sub_address_size = CYHAL_EZI2C_SUB_ADDR16_BITS;
     sEzI2C_cfg.two_addresses = false;
     result = cyhal_ezi2c_init( &sEzI2C, CYBSP_I2C_SDA, CYBSP_I2C_SCL, NULL, &sEzI2C_cfg);
     if (result != CY_RSLT_SUCCESS)
-        {
-            handle_error();
-        }
-    cyhal_ezi2c_register_callback( &sEzI2C, handle_ezi2c_tuner_event, NULL);
-    cyhal_ezi2c_enable_event(&sEzI2C,
-                             (CYHAL_EZI2C_STATUS_ERR | CYHAL_EZI2C_STATUS_WRITE1 | CYHAL_EZI2C_STATUS_READ1),
-                             EZI2C_INTERRUPT_PRIORITY, true);
+    {
+        handle_error();
+    }
 
 }
 
