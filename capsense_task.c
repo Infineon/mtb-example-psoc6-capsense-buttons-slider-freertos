@@ -5,23 +5,24 @@
 *
 * Related Document: README.md
 *
-********************************************************************************
-* (c) 2019-2020, Cypress Semiconductor Corporation. All rights reserved.
-********************************************************************************
-* This software, including source code, documentation and related materials
-* (“Software”), is owned by Cypress Semiconductor Corporation or one of its
-* subsidiaries (“Cypress”) and is protected by and subject to worldwide patent
-* protection (United States and foreign), United States copyright laws and
-* international treaty provisions. Therefore, you may use this Software only
-* as provided in the license agreement accompanying the software package from
-* which you obtained this Software (“EULA”).
+*******************************************************************************
+* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
-* If no EULA applies, Cypress hereby grants you a personal, nonexclusive,
-* non-transferable license to copy, modify, and compile the Software source
-* code solely for use in connection with Cypress’s integrated circuit products.
-* Any reproduction, modification, translation, compilation, or representation
-* of this Software except as specified above is prohibited without the express
-* written permission of Cypress.
+* This software, including source code, documentation and related
+* materials ("Software") is owned by Cypress Semiconductor Corporation
+* or one of its affiliates ("Cypress") and is protected by and subject to
+* worldwide patent protection (United States and foreign),
+* United States copyright laws and international treaty provisions.
+* Therefore, you may use this Software only as provided in the license
+* agreement accompanying the software package from which you
+* obtained this Software ("EULA").
+* If no EULA applies, Cypress hereby grants you a personal, non-exclusive,
+* non-transferable license to copy, modify, and compile the Software
+* source code solely for use in connection with Cypress's
+* integrated circuit products.  Any reproduction, modification, translation,
+* compilation, or representation of this Software except as specified
+* above is prohibited without the express written permission of Cypress.
 *
 * Disclaimer: THIS SOFTWARE IS PROVIDED AS-IS, WITH NO WARRANTY OF ANY KIND,
 * EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, NONINFRINGEMENT, IMPLIED
@@ -31,11 +32,11 @@
 * Software or any product or circuit described in the Software. Cypress does
 * not authorize its products for use in any products where a malfunction or
 * failure of the Cypress product may reasonably be expected to result in
-* significant property damage, injury or death (“High Risk Product”). By
-* including Cypress’s product in a High Risk Product, the manufacturer of such
-* system or application assumes all risk of such use and in doing so agrees to
-* indemnify Cypress against all liability.
-*****************************************​**************************************/
+* significant property damage, injury or death ("High Risk Product"). By
+* including Cypress's product in a High Risk Product, the manufacturer
+* of such system or application assumes all risk of such use and in doing
+* so agrees to indemnify Cypress against all liability.
+*******************************************************************************/
 
 
 /******************************************************************************
@@ -74,6 +75,7 @@ static void capsense_end_of_scan_callback(cy_stc_active_scan_sns_t* active_scan_
 static void capsense_timer_callback(TimerHandle_t xTimer);
 void handle_error(void);
 
+
 /******************************************************************************
 * Global variables
 ******************************************************************************/
@@ -100,6 +102,7 @@ cy_stc_syspm_callback_t capsense_deep_sleep_cb =
     NULL,
     NULL
 };
+
 
 /*******************************************************************************
 * Function Name: handle_error
@@ -209,6 +212,7 @@ void task_capsense(void* param)
         }
     }
 }
+
 
 /*******************************************************************************
 * Function Name: process_touch
@@ -381,7 +385,7 @@ static void capsense_end_of_scan_callback(cy_stc_active_scan_sns_t* active_scan_
 *******************************************************************************/
 static void capsense_timer_callback(TimerHandle_t xTimer)
 {
-	Cy_CapSense_Wakeup(&cy_capsense_context);
+    Cy_CapSense_Wakeup(&cy_capsense_context);
     capsense_command_t command = CAPSENSE_SCAN;
     BaseType_t xYieldRequired;
 
@@ -434,5 +438,6 @@ static void tuner_init(void)
     }
 
 }
+
 
 /* END OF FILE [] */
