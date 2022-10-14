@@ -10,11 +10,11 @@
 *              This code example uses FreeRTOS. For documentation and API
 *              references of FreeRTOS, visit : https://www.freertos.org
 *
-* Related Document: See README.md
+* Related Document: See README.md 
 *
 *
 *******************************************************************************
-* Copyright 2019-2021, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2019-2022, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
